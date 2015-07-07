@@ -32,7 +32,7 @@ class SV_RedisViewCounter_XenForo_Model_Thread extends XFCP_SV_RedisViewCounter_
         $pattern = Cm_Cache_Backend_Redis::PREFIX_KEY . $cache->getOption('cache_id_prefix') . 'views.thread.';
 
         // indicate to the redis instance would like to process X items at a time.
-        $count = 1000;
+        $count = 10000;
         // find indexes matching the pattern
         $cursor = null;
         $keys = array();
