@@ -5,13 +5,12 @@ class SV_RedisViewCounter_XenForo_Model_Thread extends XFCP_SV_RedisViewCounter_
     public function logThreadView($threadId)
     {
         $registry = $this->_getDataRegistryModel();
-        if (!method_exists($registry, 'getCredis'))
+        $cache = $this->_getCache(true);
+        if (!method_exists($registry, 'getCredis') && $credis = $registry->getCredis($cache))
         {
             parent::logThreadView($threadId);
             return;
         }
-        $cache = $this->_getCache(true);
-        $credis = $registry->getCredis($cache);
         $pattern = Cm_Cache_Backend_Redis::PREFIX_KEY . $cache->getOption('cache_id_prefix') . 'views.thread.';
 
         $key = $pattern . $threadId;
@@ -22,13 +21,12 @@ class SV_RedisViewCounter_XenForo_Model_Thread extends XFCP_SV_RedisViewCounter_
     public function updateThreadViews()
     {
         $registry = $this->_getDataRegistryModel();
-        if (!method_exists($registry, 'getCredis'))
+        $cache = $this->_getCache(true);
+        if (!method_exists($registry, 'getCredis') && $credis = $registry->getCredis($cache))
         {
             parent::updateThreadViews();
             return;
         }
-        $cache = $this->_getCache(true);
-        $credis = $registry->getCredis($cache);
         $pattern = Cm_Cache_Backend_Redis::PREFIX_KEY . $cache->getOption('cache_id_prefix') . 'views.thread.';
 
         // indicate to the redis instance would like to process X items at a time.
