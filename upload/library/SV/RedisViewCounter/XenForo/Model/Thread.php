@@ -6,7 +6,7 @@ class SV_RedisViewCounter_XenForo_Model_Thread extends XFCP_SV_RedisViewCounter_
     {
         $registry = $this->_getDataRegistryModel();
         $cache = $this->_getCache(true);
-        if (!method_exists($registry, 'getCredis') && $credis = $registry->getCredis($cache))
+        if (!method_exists($registry, 'getCredis') || !($credis = $registry->getCredis($cache)))
         {
             parent::logThreadView($threadId);
             return;
@@ -22,7 +22,7 @@ class SV_RedisViewCounter_XenForo_Model_Thread extends XFCP_SV_RedisViewCounter_
     {
         $registry = $this->_getDataRegistryModel();
         $cache = $this->_getCache(true);
-        if (!method_exists($registry, 'getCredis') && $credis = $registry->getCredis($cache))
+        if (!method_exists($registry, 'getCredis') || !($credis = $registry->getCredis($cache)))
         {
             parent::updateThreadViews();
             return;
