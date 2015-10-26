@@ -2,7 +2,7 @@
 
 class SV_RedisViewCounter_Listener
 {
-    const AddonNameSpace = 'SV_RedisViewCounter';
+    const AddonNameSpace = 'SV_RedisViewCounter_';
 
     public static function install($installedAddon, array $addonData, SimpleXMLElement $xml)
     {
@@ -16,6 +16,6 @@ class SV_RedisViewCounter_Listener
 
     public static function load_class($class, array &$extend)
     {
-        $extend[] = self::AddonNameSpace.'_'.$class;
+        $extend[] = self::AddonNameSpace.$class;
     }
 }

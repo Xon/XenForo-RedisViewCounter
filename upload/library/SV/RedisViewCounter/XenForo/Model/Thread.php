@@ -18,6 +18,8 @@ class SV_RedisViewCounter_XenForo_Model_Thread extends XFCP_SV_RedisViewCounter_
         $credis->incr($key);
     }
 
+    const LUA_GETDEL_SH1 = '6ba37a6998bb00d0b7f837a115df4b20388b71e0';
+
     public function updateThreadViews()
     {
         $registry = $this->_getDataRegistryModel();
@@ -49,15 +51,31 @@ class SV_RedisViewCounter_XenForo_Model_Thread extends XFCP_SV_RedisViewCounter_
         }
         if ($keys)
         {
+            $useLua = method_exists($registry, 'useLua') && $registry->useLua($cache);
             $db = $this->_getDb();
             foreach($keys as $key)
             {
                 // atomically get & delete the key
-                $credis->pipeline()->multi();
-                $credis->get($key);
-                $credis->del($key);
-                $arrData = $credis->exec();
-                $thread_view_count = $arrData[0];
+                if ($useLua)
+                {
+                    $thread_view_count = $credis->evalSha(self::LUA_GETDEL_SH1, array($key), 1);
+                    if (is_null($thread_view_count))
+                    {
+                        $script =
+                            "local oldVal = redis.call('GET', KEYS[1]) ".
+                            "redis.call('DEL', KEYS[1]) ".
+                            "return oldVal ";
+                        $thread_view_count = $credis->eval($script, array($key), 1);
+                    }
+                }
+                else
+                {
+                    $credis->pipeline()->multi();
+                    $credis->get($key);
+                    $credis->del($key);
+                    $arrData = $credis->exec();
+                    $thread_view_count = $arrData[0];
+                }                
                 // only update the database if a thread view happened
                 if (!empty($thread_view_count))
                 {
