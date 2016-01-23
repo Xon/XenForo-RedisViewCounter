@@ -39,12 +39,11 @@ class SV_RedisViewCounter_XenForo_Model_Thread extends XFCP_SV_RedisViewCounter_
         $loopGuard = 100;
         // find indexes matching the pattern
         $cursor = null;
-        while($loopGuard > 0)
+        do
         {
             $keys = $credis->scan($cursor, $pattern ."*", $count);
             $loopGuard--;
-            // scan can return an empty array
-            if (empty($cursor) || $keys === false)
+            if ($keys === false)
             {
                 break;
             }
@@ -80,5 +79,6 @@ class SV_RedisViewCounter_XenForo_Model_Thread extends XFCP_SV_RedisViewCounter_
                 }
             }
         }
+        while($loopGuard > 0 && !empty($cursor));
     }
 }
