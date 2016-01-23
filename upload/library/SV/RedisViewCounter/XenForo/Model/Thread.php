@@ -29,30 +29,26 @@ class SV_RedisViewCounter_XenForo_Model_Thread extends XFCP_SV_RedisViewCounter_
             parent::updateThreadViews();
             return;
         }
+        $db = $this->_getDb();
+        $useLua = method_exists($registry, 'useLua') && $registry->useLua($cache);
         $pattern = Cm_Cache_Backend_Redis::PREFIX_KEY . $cache->getOption('cache_id_prefix') . 'views.thread.';
 
         // indicate to the redis instance would like to process X items at a time.
         $count = 10000;
+        // prevent looping forever
+        $loopGuard = 100;
         // find indexes matching the pattern
         $cursor = null;
-        $keys = array();
-        while(true)
+        while($loopGuard > 0)
         {
-            $next_keys = $credis->scan($cursor, $pattern ."*", $count);
+            $keys = $credis->scan($cursor, $pattern ."*", $count);
+            $loopGuard--;
             // scan can return an empty array
-            if($next_keys)
-            {
-                $keys += $next_keys;
-            }
-            if (empty($cursor) || $next_keys === false)
+            if (empty($cursor) || $keys === false)
             {
                 break;
             }
-        }
-        if ($keys)
-        {
-            $useLua = method_exists($registry, 'useLua') && $registry->useLua($cache);
-            $db = $this->_getDb();
+
             foreach($keys as $key)
             {
                 // atomically get & delete the key
@@ -75,7 +71,7 @@ class SV_RedisViewCounter_XenForo_Model_Thread extends XFCP_SV_RedisViewCounter_
                     $credis->del($key);
                     $arrData = $credis->exec();
                     $thread_view_count = $arrData[0];
-                }                
+                }
                 // only update the database if a thread view happened
                 if (!empty($thread_view_count))
                 {
