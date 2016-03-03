@@ -74,8 +74,8 @@ class SV_RedisViewCounter_XenForo_Model_Attachment extends XFCP_SV_RedisViewCoun
                 // only update the database if a thread view happened
                 if (!empty($attachment_view_count))
                 {
-                    $attachment_id = str_replace($pattern, '', $key);
-                    $db->query('UPDATE xf_thread SET view_count = view_count + ? where thread_id = ?', array($attachment_view_count, $attachment_id));
+                    $attachmentId = str_replace($pattern, '', $key);
+                    $db->query('UPDATE xf_attachment SET view_count = view_count + ? where attachment_id = ?', array($attachment_view_count, $attachmentId));
                 }
             }
         }
