@@ -50,6 +50,11 @@ class SV_RedisViewCounter_XenForo_Model_Thread extends XFCP_SV_RedisViewCounter_
 
             foreach($keys as $key)
             {
+                $id = str_replace($pattern, '', $key);
+                if (preg_match('/^[0-9]+$/', $id) != 1)
+                {
+                    continue;
+                }
                 // atomically get & delete the key
                 if ($useLua)
                 {
@@ -75,8 +80,7 @@ class SV_RedisViewCounter_XenForo_Model_Thread extends XFCP_SV_RedisViewCounter_
                 // only update the database if a thread view happened
                 if (!empty($thread_view_count))
                 {
-                    $thread_id = str_replace($pattern, '', $key);
-                    $db->query('UPDATE xf_thread SET view_count = view_count + ? where thread_id = ?', array($thread_view_count, $thread_id));
+                    $db->query('UPDATE xf_thread SET view_count = view_count + ? where thread_id = ?', array($thread_view_count, $id));
                 }
             }
         }

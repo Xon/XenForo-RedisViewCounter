@@ -50,6 +50,11 @@ class SV_RedisViewCounter_XenForo_Model_Attachment extends XFCP_SV_RedisViewCoun
 
             foreach($keys as $key)
             {
+                $id = str_replace($pattern, '', $key);
+                if (preg_match('/^[0-9]+$/', $id) != 1)
+                {
+                    continue;
+                }
                 // atomically get & delete the key
                 if ($useLua)
                 {
@@ -75,8 +80,8 @@ class SV_RedisViewCounter_XenForo_Model_Attachment extends XFCP_SV_RedisViewCoun
                 // only update the database if a thread view happened
                 if (!empty($attachment_view_count))
                 {
-                    $attachmentId = str_replace($pattern, '', $key);
-                    $db->query('UPDATE xf_attachment SET view_count = view_count + ? where attachment_id = ?', array($attachment_view_count, $attachmentId));
+
+                    $db->query('UPDATE xf_attachment SET view_count = view_count + ? where attachment_id = ?', array($attachment_view_count, $id));
                 }
             }
         }
