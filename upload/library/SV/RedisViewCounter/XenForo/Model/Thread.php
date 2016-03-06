@@ -58,14 +58,14 @@ class SV_RedisViewCounter_XenForo_Model_Thread extends XFCP_SV_RedisViewCounter_
                 // atomically get & delete the key
                 if ($useLua)
                 {
-                    $thread_view_count = $credis->evalSha(self::LUA_GETDEL_SH1, array($key), 1);
-                    if (is_null($thread_view_count))
+                    $view_count = $credis->evalSha(self::LUA_GETDEL_SH1, array($key), 1);
+                    if (is_null($view_count))
                     {
                         $script =
                             "local oldVal = redis.call('GET', KEYS[1]) ".
                             "redis.call('DEL', KEYS[1]) ".
                             "return oldVal ";
-                        $thread_view_count = $credis->eval($script, array($key), 1);
+                        $view_count = $credis->eval($script, array($key), 1);
                     }
                 }
                 else
@@ -74,13 +74,13 @@ class SV_RedisViewCounter_XenForo_Model_Thread extends XFCP_SV_RedisViewCounter_
                     $credis->get($key);
                     $credis->del($key);
                     $arrData = $credis->exec();
-                    $thread_view_count = $arrData[0];
+                    $view_count = $arrData[0];
                 }
-                $thread_view_count = intval($thread_view_count);
+                $view_count = intval($view_count);
                 // only update the database if a thread view happened
-                if (!empty($thread_view_count))
+                if (!empty($view_count))
                 {
-                    $db->query('UPDATE xf_thread SET view_count = view_count + ? where thread_id = ?', array($thread_view_count, $id));
+                    $db->query('UPDATE xf_thread SET view_count = view_count + ? where thread_id = ?', array($view_count, $id));
                 }
             }
         }
