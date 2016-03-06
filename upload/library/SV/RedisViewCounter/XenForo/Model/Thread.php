@@ -71,6 +71,7 @@ class SV_RedisViewCounter_XenForo_Model_Thread extends XFCP_SV_RedisViewCounter_
                     $arrData = $credis->exec();
                     $thread_view_count = $arrData[0];
                 }
+                $thread_view_count = intval($thread_view_count);
                 // only update the database if a thread view happened
                 if (!empty($thread_view_count))
                 {

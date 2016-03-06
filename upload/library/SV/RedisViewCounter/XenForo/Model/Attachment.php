@@ -71,6 +71,7 @@ class SV_RedisViewCounter_XenForo_Model_Attachment extends XFCP_SV_RedisViewCoun
                     $arrData = $credis->exec();
                     $attachment_view_count = $arrData[0];
                 }
+                $thread_view_count = intval($thread_view_count);
                 // only update the database if a thread view happened
                 if (!empty($attachment_view_count))
                 {
