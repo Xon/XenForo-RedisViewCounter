@@ -50,7 +50,18 @@ class SV_RedisViewCounter_XenForo_Model_Thread extends XFCP_SV_RedisViewCounter_
 
             foreach($keys as $key)
             {
+                if ($key === false || is_array($key))
+                {
+                    XenForo_Error::logException(new Exception('Unexpected state pattern:'. var_export($pattern, true).' key:'. var_export($key, true)), false);
+                    continue;
+                }
+
                 $id = str_replace($pattern, '', $key);
+                if ($id === false || is_array($id))
+                {
+                    XenForo_Error::logException(new Exception('Error extracting thread id from key. id:'. var_export($id, true).' key:'. var_export($key, true)), false);
+                    continue;
+                }
                 if (preg_match('/^[0-9]+$/', $id) != 1)
                 {
                     continue;
