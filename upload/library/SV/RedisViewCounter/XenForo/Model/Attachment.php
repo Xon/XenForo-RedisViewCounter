@@ -34,9 +34,9 @@ class SV_RedisViewCounter_XenForo_Model_Attachment extends XFCP_SV_RedisViewCoun
         $pattern = Cm_Cache_Backend_Redis::PREFIX_KEY . $cache->getOption('cache_id_prefix') . 'views.attachment.';
 
         // indicate to the redis instance would like to process X items at a time.
-        $count = 10000;
+        $count = 100;
         // prevent looping forever
-        $loopGuard = 100;
+        $loopGuard = 10000;
         // find indexes matching the pattern
         $cursor = null;
         do
